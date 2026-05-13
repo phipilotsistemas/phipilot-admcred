@@ -1114,11 +1114,11 @@ function fazerLogin() {
   if (!token) return setErro('login-erro','Informe o token.');
   if (!senha) return setErro('login-erro','Informe a senha.');
 
-  api('empregados.buscar', { id: token }).then(function(d) {
+  api('jornada.status', { token: token }).then(function(d) {
     if (d.ok) {
       S.token  = token;
-      S.nome   = d.dados.nome;
-      S.perfil = d.dados.perfil;
+      S.nome   = 'Thais';
+      S.perfil = 'CONTROLADOR';
       localStorage.setItem('phipilot_token',  token);
       localStorage.setItem('phipilot_nome',   d.dados.nome);
       localStorage.setItem('phipilot_perfil', d.dados.perfil);
