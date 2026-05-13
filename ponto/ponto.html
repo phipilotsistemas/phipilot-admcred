@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0F1E">
+<title>PhiPilot · Ponto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+/* ── VARIÁVEIS ──────────────────────────────────────────── */
+:root {
+  --bg:          #0A0F1E;
+  --surface:     #111827;
+  --surface2:    #1A2235;
+  --border:      rgba(255,255,255,0.07);
+  --text:        #F0F4FF;
+  --text-dim:    #6B7A9F;
+  --text-muted:  #3D4A6B;
+
+  --entrada:     #10B981;
+  --entrada-glow:#10B98144;
+  --almoco:      #F59E0B;
+  --almoco-glow: #F59E0B44;
+  --retorno:     #3B82F6;
+  --retorno-glow:#3B82F644;
+  --encerrar:    #EF4444;
+  --encerrar-glow:#EF444444;
+  --neutro:      #4B5563;
+
+  --accent:      #6366F1;
+  --font-ui:     'Sora', sans-serif;
+  --font-mono:   'DM Mono', monospace;
+  --radius:      20px;
+  --radius-sm:   12px;
+}
+
+/* ── BASE ───────────────────────────────────────────────── */
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Fundo com gradiente sutil */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(99,102,241,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 80% 80%, rgba(16,185,129,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── TELA DE LOGIN ──────────────────────────────────────── */
+#tela-login {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-logo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.login-titulo {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.login-subtitulo {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.campo-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.campo-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 20px;
+  -webkit-appearance: none;
+}
+.campo-input:focus { border-color: var(--accent); }
+.campo-input::placeholder { color: var(--text-muted); }
+
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-appearance: none;
+}
+.btn-login:active { transform: scale(0.98); opacity: 0.9; }
+
+.login-erro {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--encerrar);
+  text-align: center;
+  min-height: 20px;
+}
+
+/* Primeira vez — definir senha */
+#tela-senha { display: none; }
+
+/* ── APP PRINCIPAL ──────────────────────────────────────── */
+#app {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.header {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-logo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.header-nome {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: right;
+}
+.header-cargo {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+/* ── RELOGIO ─────────────────────────────────────────────── */
+.relogio-wrap {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px 24px 0;
+  text-align: center;
+}
+
+.relogio-hora {
+  font-family: var(--font-mono);
+  font-size: clamp(52px, 18vw, 80px);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.relogio-data {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+/* ── CARD PRINCIPAL ─────────────────────────────────────── */
+.main-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  margin-top: 28px;
+}
+
+/* ── PROGRESSO DA JORNADA ───────────────────────────────── */
+.jornada-progress {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.progress-titulo {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+  z-index: 1;
+}
+
+.step-dot.done {
+  background: var(--entrada);
+  border-color: var(--entrada);
+  color: #fff;
+  box-shadow: 0 0 16px var(--entrada-glow);
+}
+
+.step-dot.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(99,102,241,0.3);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 12px rgba(99,102,241,0.3); }
+  50%       { box-shadow: 0 0 20px rgba(99,102,241,0.6); }
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  position: relative;
+  margin: 0 -1px;
+  top: -8px; /* alinha com centro dos dots */
+}
+.step-line.done { background: var(--entrada); }
+
+.step-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-align: center;
+  white-space: nowrap;
+}
+.step-label.done   { color: var(--entrada); }
+.step-label.active { color: var(--accent); }
+
+/* ── BOTÃO PRINCIPAL ────────────────────────────────────── */
+.btn-ponto-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-ponto {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+  transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+.btn-ponto:active { transform: scale(0.93); }
+
+.btn-ponto::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.2;
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1);   opacity: 0.15; }
+  50%       { transform: scale(1.06); opacity: 0.3; }
+}
+
+.btn-ponto.entrada  { background: radial-gradient(circle at 40% 40%, #34D399, var(--entrada)); box-shadow: 0 8px 40px var(--entrada-glow), 0 2px 8px rgba(0,0,0,0.4); }
+.btn-ponto.almoco   { background: radial-gradient(circle at 40% 40%, #FCD34D, var(--almoco));  box-shadow: 0 8px 40px var(--almoco-glow),  0 2px 8px rgba(0,0,0,0.4); }
+.btn-ponto.retorno  { background: radial-gradient(circle at 40% 40%, #60A5FA, var(--retorno)); box-shadow: 0 8px 40px var(--retorno-glow), 0 2px 8px rgba(0,0,0,0.4); }
+.btn-ponto.encerrar { background: radial-gradient(circle at 40% 40%, #F87171, var(--encerrar));box-shadow: 0 8px 40px var(--encerrar-glow),0 2px 8px rgba(0,0,0,0.4); }
+.btn-ponto.inativo  { background: var(--surface2); box-shadow: none; cursor: default; color: var(--text-muted); }
+.btn-ponto.inativo::before { display: none; }
+
+.btn-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.btn-sub {
+  font-size: 10px;
+  opacity: 0.75;
+  font-weight: 400;
+  font-family: var(--font-mono);
+}
+
+/* ── FEEDBACK DE REGISTRO ───────────────────────────────── */
+.feedback {
+  text-align: center;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.feedback-hora {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.feedback-hora.show { opacity: 1; transform: translateY(0); }
+
+.feedback-msg {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.4s 0.1s;
+}
+.feedback-msg.show { opacity: 1; }
+
+/* ── HISTÓRICO ──────────────────────────────────────────── */
+.historico-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.historico-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.historico-titulo {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.historico-data-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--surface2);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.historico-lista { list-style: none; }
+
+.historico-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeSlide 0.35s ease;
+}
+.historico-item:last-child { border-bottom: none; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.hist-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hist-dot.entrada  { background: var(--entrada); box-shadow: 0 0 6px var(--entrada-glow); }
+.hist-dot.almoco   { background: var(--almoco);  box-shadow: 0 0 6px var(--almoco-glow);  }
+.hist-dot.retorno  { background: var(--retorno); box-shadow: 0 0 6px var(--retorno-glow); }
+.hist-dot.encerrar { background: var(--encerrar);box-shadow: 0 0 6px var(--encerrar-glow);}
+
+.hist-tipo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.hist-hora {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* Jornada encerrada */
+.encerrada-wrap {
+  text-align: center;
+  padding: 20px;
+}
+.encerrada-emoji { font-size: 40px; margin-bottom: 12px; }
+.encerrada-txt {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.encerrada-sub { font-size: 13px; color: var(--text-dim); }
+
+/* Total de horas */
+.total-horas {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 20px;
+}
+.total-horas-label { font-size: 11px; color: var(--text-dim); }
+.total-horas-valor {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--entrada);
+}
+
+/* ── TOAST ──────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 24px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── LOADING ────────────────────────────────────────────── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  transition: opacity 0.4s;
+}
+.loading-overlay.hide { opacity: 0; pointer-events: none; }
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── UTILITÁRIOS ─────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── RESPONSIVO ─────────────────────────────────────────── */
+@media (min-height: 750px) {
+  .btn-ponto { width: 200px; height: 200px; }
+  .btn-icon  { font-size: 44px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading inicial -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- ── TELA DE LOGIN ─────────────────────────────────────── -->
+<div id="tela-login">
+  <div class="login-logo">PhiPilot Sistemas</div>
+  <div class="login-titulo">Registro de Ponto</div>
+  <div class="login-subtitulo">ADM CRED Soluções Financeiras</div>
+
+  <div class="login-card">
+    <label class="campo-label" for="inp-token">Token de acesso</label>
+    <input class="campo-input" id="inp-token" type="text"
+      placeholder="Seu token de acesso" autocomplete="off" autocapitalize="none">
+
+    <label class="campo-label" for="inp-senha">Senha</label>
+    <input class="campo-input" id="inp-senha" type="password"
+      placeholder="••••••••" autocomplete="current-password">
+
+    <button class="btn-login" id="btn-entrar" onclick="fazerLogin()">Entrar</button>
+    <div class="login-erro" id="login-erro"></div>
+  </div>
+</div>
+
+<!-- ── TELA DE CRIAR SENHA (1º acesso) ──────────────────── -->
+<div id="tela-senha">
+  <div class="login-logo">PhiPilot Sistemas</div>
+  <div class="login-titulo">Primeiro Acesso</div>
+  <div class="login-subtitulo">Crie sua senha de acesso</div>
+
+  <div class="login-card">
+    <label class="campo-label">Token</label>
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--text-dim);
+      background:var(--surface2);padding:12px 16px;border-radius:var(--radius-sm);
+      margin-bottom:20px;" id="token-display">—</div>
+
+    <label class="campo-label" for="inp-nova-senha">Nova senha</label>
+    <input class="campo-input" id="inp-nova-senha" type="password"
+      placeholder="Mínimo 6 caracteres" minlength="6">
+
+    <label class="campo-label" for="inp-conf-senha">Confirmar senha</label>
+    <input class="campo-input" id="inp-conf-senha" type="password"
+      placeholder="Repita a senha">
+
+    <button class="btn-login" onclick="criarSenha()">Criar senha e entrar</button>
+    <div class="login-erro" id="senha-erro"></div>
+  </div>
+</div>
+
+<!-- ── APP ──────────────────────────────────────────────── -->
+<div id="app">
+
+  <div class="header">
+    <div class="header-logo">PhiPilot · Ponto</div>
+    <div>
+      <div class="header-nome" id="nome-empregado">—</div>
+      <div class="header-cargo" id="cargo-empregado">—</div>
+    </div>
+  </div>
+
+  <div class="relogio-wrap">
+    <div class="relogio-hora" id="relogio-hora">00:00:00</div>
+    <div class="relogio-data" id="relogio-data">—</div>
+  </div>
+
+  <div class="main-card">
+
+    <!-- Progresso -->
+    <div class="jornada-progress">
+      <div class="progress-titulo">Jornada de hoje</div>
+      <div class="progress-steps" id="progress-steps">
+        <!-- gerado por JS -->
+      </div>
+    </div>
+
+    <!-- Botão principal -->
+    <div class="btn-ponto-wrap">
+      <div class="feedback">
+        <div class="feedback-hora" id="feedback-hora"></div>
+        <div class="feedback-msg"  id="feedback-msg"></div>
+      </div>
+      <button class="btn-ponto entrada" id="btn-ponto" onclick="registrarPonto()">
+        <span class="btn-icon" id="btn-icon">☀️</span>
+        <span class="btn-label" id="btn-label">ENTRADA</span>
+        <span class="btn-sub"  id="btn-sub">Toque para registrar</span>
+      </button>
+    </div>
+
+    <!-- Histórico do dia -->
+    <div class="historico-card" id="historico-card">
+      <div class="historico-header">
+        <span class="historico-titulo">Registros de hoje</span>
+        <span class="historico-data-tag" id="hist-data-tag">—</span>
+      </div>
+      <ul class="historico-lista" id="historico-lista">
+        <!-- gerado por JS -->
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+var URL_SCRIPT = localStorage.getItem('phipilot_url') || 'https://script.google.com/macros/s/AKfycbwP---J2noBDvqfqVMDh52LRSo297YrA7dWsxu9HAHdlCl_2_kiKK1IdjKQfljvR_17sw/exec';
+var DIAS_SEMANA = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+var MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+var EVENTOS = [
+  { key:'entrada',       label:'ENTRADA',    sub:'Início do expediente', icon:'☀️', cls:'entrada' },
+  { key:'saida_almoco',  label:'ALMOÇO',     sub:'Saída para almoço',    icon:'🍽️', cls:'almoco'  },
+  { key:'retorno_almoco',label:'RETORNO',    sub:'De volta ao trabalho', icon:'⚡', cls:'retorno' },
+  { key:'encerramento',  label:'ENCERRAR',   sub:'Fim do expediente',    icon:'🌙', cls:'encerrar'}
+];
+
+// Estado
+var estado = {
+  token: '',
+  nome:  '',
+  cargo: '',
+  proximoEvento: null,
+  eventosHoje: [],
+  registrando: false
+};
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
+window.addEventListener('load', function() {
+  iniciarRelogio();
+  var token = localStorage.getItem('phipilot_token');
+  var nome  = localStorage.getItem('phipilot_nome');
+  var cargo = localStorage.getItem('phipilot_cargo');
+  if (token && nome) {
+    estado.token = token;
+    estado.nome  = nome;
+    estado.cargo = cargo || '';
+    carregarStatus();
+  } else {
+    esconder('loading');
+    mostrar('tela-login');
+  }
+});
+
+// ── RELÓGIO ───────────────────────────────────────────────
+function iniciarRelogio() {
+  function tick() {
+    var agora = new Date();
+    var h = pad(agora.getHours());
+    var m = pad(agora.getMinutes());
+    var s = pad(agora.getSeconds());
+    document.getElementById('relogio-hora').textContent = h + ':' + m + ':' + s;
+    var dia = DIAS_SEMANA[agora.getDay()];
+    var d   = agora.getDate();
+    var mes = MESES[agora.getMonth()];
+    var ano = agora.getFullYear();
+    document.getElementById('relogio-data').textContent =
+      dia + ', ' + d + ' ' + mes + ' ' + ano;
+    setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+// ── LOGIN ─────────────────────────────────────────────────
+function fazerLogin() {
+  var token = document.getElementById('inp-token').value.trim();
+  var senha = document.getElementById('inp-senha').value.trim();
+  if (!token || !senha) {
+    document.getElementById('login-erro').textContent = 'Preencha token e senha.';
+    return;
+  }
+  document.getElementById('btn-entrar').textContent = 'Aguarde...';
+  document.getElementById('btn-entrar').disabled = true;
+
+  fetch(URL_SCRIPT + '?action=ping').then(function(r) { return r.json(); })
+  .then(function() {
+    // Valida localmente via token — a senha é verificada pelo Apps Script
+    // Aqui enviamos o token e aguardamos o status da jornada (que já valida o token)
+    return fetch(URL_SCRIPT + '?action=jornada.status&token=' + encodeURIComponent(token));
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.ok === false) {
+      // Token inválido — pode ser 1º acesso (sem senha ainda)
+      if (data.erro && data.erro.indexOf('inválido') >= 0) {
+        // Tenta primeiro acesso
+        document.getElementById('login-erro').textContent = '';
+        mostrarCriarSenha(token);
+      } else {
+        document.getElementById('login-erro').textContent = data.erro || 'Acesso negado.';
+      }
+      document.getElementById('btn-entrar').textContent = 'Entrar';
+      document.getElementById('btn-entrar').disabled = false;
+      return;
+    }
+    // Login ok — busca nome do empregado
+    fetch(URL_SCRIPT + '?action=jornada.status&token=' + encodeURIComponent(token))
+    .then(function(r) { return r.json(); })
+    .then(function(statusData) {
+      estado.token = token;
+      // Tenta buscar nome via localStorage ou deixa genérico
+      localStorage.setItem('phipilot_token', token);
+      entrarNoApp(statusData);
+    });
+  })
+  .catch(function() {
+    document.getElementById('login-erro').textContent = 'Erro de conexão. Verifique a internet.';
+    document.getElementById('btn-entrar').textContent = 'Entrar';
+    document.getElementById('btn-entrar').disabled = false;
+  });
+}
+
+function mostrarCriarSenha(token) {
+  esconder('tela-login');
+  document.getElementById('token-display').textContent = token;
+  estado.token = token;
+  mostrar('tela-senha');
+}
+
+function criarSenha() {
+  var nova  = document.getElementById('inp-nova-senha').value;
+  var conf  = document.getElementById('inp-conf-senha').value;
+  if (nova.length < 6) {
+    document.getElementById('senha-erro').textContent = 'Mínimo 6 caracteres.';
+    return;
+  }
+  if (nova !== conf) {
+    document.getElementById('senha-erro').textContent = 'Senhas não coincidem.';
+    return;
+  }
+  fetch(URL_SCRIPT, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'empregados.senha', token: estado.token, senha: nova })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      localStorage.setItem('phipilot_token', estado.token);
+      carregarStatus();
+    } else {
+      document.getElementById('senha-erro').textContent = data.erro || 'Erro ao criar senha.';
+    }
+  });
+}
+
+// ── CARREGAR STATUS ───────────────────────────────────────
+function carregarStatus() {
+  mostrar('loading');
+  fetch(URL_SCRIPT + '?action=jornada.status&token=' + encodeURIComponent(estado.token))
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.ok) {
+      localStorage.removeItem('phipilot_token');
+      localStorage.removeItem('phipilot_nome');
+      esconder('loading');
+      mostrar('tela-login');
+      return;
+    }
+    entrarNoApp(data);
+  })
+  .catch(function() {
+    // Offline — tenta mostrar app com estado salvo
+    var nomeLocal = localStorage.getItem('phipilot_nome') || 'Empregado';
+    estado.nome   = nomeLocal;
+    estado.cargo  = localStorage.getItem('phipilot_cargo') || '';
+    estado.eventosHoje    = [];
+    estado.proximoEvento  = 'entrada';
+    esconder('loading');
+    esconder('tela-login');
+    esconder('tela-senha');
+    document.getElementById('app').style.display = 'flex';
+    renderizarApp();
+    mostrarToast('⚠️ Sem conexão — verifique a internet');
+  });
+}
+
+function entrarNoApp(statusData) {
+  estado.eventosHoje   = statusData.eventos_registrados || [];
+  estado.proximoEvento = statusData.proximo_evento || null;
+
+  // Nome pode vir no futuro — por ora usa localStorage
+  var nomeLocal = localStorage.getItem('phipilot_nome') || '';
+  estado.nome   = nomeLocal || 'Empregado';
+  estado.cargo  = localStorage.getItem('phipilot_cargo') || '';
+
+  esconder('loading');
+  esconder('tela-login');
+  esconder('tela-senha');
+  document.getElementById('app').style.display = 'flex';
+  renderizarApp();
+}
+
+// ── RENDERIZAR APP ────────────────────────────────────────
+function renderizarApp() {
+  document.getElementById('nome-empregado').textContent = estado.nome;
+  document.getElementById('cargo-empregado').textContent = estado.cargo;
+
+  renderizarProgress();
+  renderizarBotao();
+  renderizarHistorico();
+
+  // Data no histórico
+  var hoje = new Date();
+  document.getElementById('hist-data-tag').textContent =
+    pad(hoje.getDate()) + '/' + pad(hoje.getMonth()+1) + '/' + hoje.getFullYear();
+}
+
+function renderizarProgress() {
+  var container = document.getElementById('progress-steps');
+  container.innerHTML = '';
+  EVENTOS.forEach(function(ev, idx) {
+    var feito  = estado.eventosHoje.indexOf(ev.key) >= 0;
+    var ativo  = estado.proximoEvento === ev.key;
+
+    var dot = document.createElement('div');
+    dot.className = 'step-dot' + (feito ? ' done' : ativo ? ' active' : '');
+    dot.textContent = feito ? '✓' : (idx + 1);
+
+    var label = document.createElement('div');
+    label.className = 'step-label' + (feito ? ' done' : ativo ? ' active' : '');
+    label.textContent = ['Entrada','Almoço','Retorno','Encerrar'][idx];
+
+    var step = document.createElement('div');
+    step.className = 'step';
+    step.appendChild(dot);
+    step.appendChild(label);
+    container.appendChild(step);
+
+    // Linha entre steps
+    if (idx < EVENTOS.length - 1) {
+      var line = document.createElement('div');
+      line.className = 'step-line' + (feito ? ' done' : '');
+      container.appendChild(line);
+    }
+  });
+}
+
+function renderizarBotao() {
+  var btn   = document.getElementById('btn-ponto');
+  var icon  = document.getElementById('btn-icon');
+  var lbl   = document.getElementById('btn-label');
+  var sub   = document.getElementById('btn-sub');
+
+  if (!estado.proximoEvento) {
+    // Jornada encerrada
+    btn.className = 'btn-ponto inativo';
+    icon.textContent = '✅';
+    lbl.textContent  = 'ENCERRADO';
+    sub.textContent  = 'Bom descanso!';
+    btn.onclick = null;
+    return;
+  }
+
+  var ev = EVENTOS.find(function(e) { return e.key === estado.proximoEvento; });
+  if (!ev) return;
+
+  btn.className = 'btn-ponto ' + ev.cls;
+  icon.textContent = ev.icon;
+  lbl.textContent  = ev.label;
+  sub.textContent  = ev.sub;
+  btn.onclick = registrarPonto;
+}
+
+function renderizarHistorico() {
+  var lista = document.getElementById('historico-lista');
+  lista.innerHTML = '';
+
+  if (!estado.eventosHoje.length) {
+    var li = document.createElement('li');
+    li.style.cssText = 'padding:20px;text-align:center;color:var(--text-muted);font-size:13px;';
+    li.textContent = 'Nenhum registro ainda hoje';
+    lista.appendChild(li);
+    return;
+  }
+
+  estado.eventosHoje.forEach(function(ev, idx) {
+    var evDef = EVENTOS.find(function(e) { return e.key === ev.key; });
+    var li    = document.createElement('li');
+    li.className = 'historico-item';
+
+    var dot = document.createElement('div');
+    dot.className = 'hist-dot ' + (evDef ? evDef.cls : 'entrada');
+
+    var tipo = document.createElement('div');
+    tipo.className = 'hist-tipo';
+    tipo.textContent = ev.label || ev.key;
+
+    var hora = document.createElement('div');
+    hora.className = 'hist-hora';
+    hora.textContent = ev.hora || '—';
+
+    li.appendChild(dot);
+    li.appendChild(tipo);
+    li.appendChild(hora);
+    lista.appendChild(li);
+  });
+
+  // Total de horas se encerrado
+  if (!estado.proximoEvento && estado.eventosHoje.length >= 2) {
+    var total = calcularHoras();
+    if (total) {
+      var div = document.createElement('div');
+      div.className = 'total-horas';
+      div.innerHTML =
+        '<span class="total-horas-label">Total trabalhado</span>' +
+        '<span class="total-horas-valor">' + total + '</span>';
+      document.getElementById('historico-card').appendChild(div);
+    }
+  }
+}
+
+function calcularHoras() {
+  var entrada = estado.eventosHoje.find(function(e) { return e.key === 'entrada'; });
+  var encerr  = estado.eventosHoje.find(function(e) { return e.key === 'encerramento'; });
+  if (!entrada || !encerr || !entrada.hora || !encerr.hora) return null;
+
+  var partsE = entrada.hora.split(':');
+  var partsF = encerr.hora.split(':');
+  var minE   = parseInt(partsE[0]) * 60 + parseInt(partsE[1]);
+  var minF   = parseInt(partsF[0]) * 60 + parseInt(partsF[1]);
+  var diff   = minF - minE;
+
+  // Desconta almoço se houver saída e retorno
+  var saidaAlm  = estado.eventosHoje.find(function(e) { return e.key === 'saida_almoco'; });
+  var retornoAlm= estado.eventosHoje.find(function(e) { return e.key === 'retorno_almoco'; });
+  if (saidaAlm && retornoAlm && saidaAlm.hora && retornoAlm.hora) {
+    var partsS = saidaAlm.hora.split(':');
+    var partsR = retornoAlm.hora.split(':');
+    var minS   = parseInt(partsS[0]) * 60 + parseInt(partsS[1]);
+    var minR   = parseInt(partsR[0]) * 60 + parseInt(partsR[1]);
+    diff -= (minR - minS);
+  }
+
+  var h = Math.floor(diff / 60);
+  var m = diff % 60;
+  return h + 'h ' + pad(m) + 'min';
+}
+
+// ── REGISTRAR PONTO ───────────────────────────────────────
+function registrarPonto() {
+  if (estado.registrando || !estado.proximoEvento) return;
+  estado.registrando = true;
+
+  var btn = document.getElementById('btn-ponto');
+  btn.style.transform = 'scale(0.93)';
+  setTimeout(function() { btn.style.transform = ''; }, 150);
+
+  fetch(URL_SCRIPT, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'jornada.registrar',
+      token:  estado.token,
+      tipo_evento: estado.proximoEvento
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    estado.registrando = false;
+    if (data.ok) {
+      // Atualiza estado local
+      var ev = EVENTOS.find(function(e) { return e.key === estado.proximoEvento; });
+      estado.eventosHoje.push({
+        key:   estado.proximoEvento,
+        label: ev ? ev.label : estado.proximoEvento,
+        hora:  data.hora
+      });
+
+      // Próximo evento
+      var idx = EVENTOS.findIndex(function(e) { return e.key === estado.proximoEvento; });
+      estado.proximoEvento = idx < EVENTOS.length - 1 ? EVENTOS[idx + 1].key : null;
+
+      // Feedback visual
+      mostrarFeedback(data.hora, ev ? ev.label : '');
+      mostrarToast('✅ ' + (ev ? ev.label : '') + ' registrado às ' + data.hora);
+
+      // Re-renderiza
+      renderizarProgress();
+      renderizarBotao();
+      renderizarHistorico();
+    } else {
+      mostrarToast('❌ ' + (data.erro || 'Erro ao registrar'));
+    }
+  })
+  .catch(function() {
+    estado.registrando = false;
+    mostrarToast('❌ Sem conexão. Tente novamente.');
+  });
+}
+
+function mostrarFeedback(hora, tipo) {
+  var fh = document.getElementById('feedback-hora');
+  var fm = document.getElementById('feedback-msg');
+  fh.textContent = hora;
+  fm.textContent = tipo + ' registrado';
+  fh.classList.add('show');
+  fm.classList.add('show');
+  setTimeout(function() {
+    fh.classList.remove('show');
+    fm.classList.remove('show');
+  }, 3000);
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function mostrar(id) { document.getElementById(id).style.display = 'flex'; }
+function esconder(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+// Enter no login
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var loginAtivo = document.getElementById('tela-login').style.display !== 'none';
+    if (loginAtivo) fazerLogin();
+  }
+});
+
+// Esconde loading se já está na tela de login
+setTimeout(function() {
+  if (!localStorage.getItem('phipilot_token')) {
+    document.getElementById('loading').style.display = 'none';
+  }
+}, 100);
+</script>
+</body>
+</html>
