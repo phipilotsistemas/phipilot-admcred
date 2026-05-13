@@ -1095,16 +1095,12 @@ var MENUS = {
 
 // ── INICIALIZAÇÃO ─────────────────────────────────────────
 window.addEventListener('load', function() {
-  var token = localStorage.getItem('phipilot_token');
-  if (token) {
-    S.token  = token;
-    S.nome   = localStorage.getItem('phipilot_nome')   || '';
-    S.perfil = localStorage.getItem('phipilot_perfil') || '';
-    iniciarApp();
-  } else {
-    hide('loading');
-    show('tela-login');
-  }
+  // Limpa qualquer estado travado de sessões anteriores
+  localStorage.removeItem('phipilot_token');
+  localStorage.removeItem('phipilot_nome');
+  localStorage.removeItem('phipilot_perfil');
+  hide('loading');
+  show('tela-login');
 });
 
 // ── LOGIN ─────────────────────────────────────────────────
@@ -1114,7 +1110,14 @@ function fazerLogin() {
   if (!token) return setErro('login-erro','Informe o token.');
   if (!senha) return setErro('login-erro','Informe a senha.');
 
-  api('jornada.status', { token: token }).then(function(d) {
+  setErro('login-erro','');
+  var btnLogin = document.querySelector('#tela-login .btn-login');
+  if (btnLogin) btnLogin.textContent = 'Verificando...';
+
+  fetch(URL_SCRIPT + '?action=jornada.status&token=' + encodeURIComponent(token))
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (btnLogin) btnLogin.textContent = 'Entrar';
     if (d.ok) {
       S.token  = token;
       S.nome   = 'Thais';
@@ -1123,23 +1126,21 @@ function fazerLogin() {
       localStorage.setItem('phipilot_nome',   'Thais');
       localStorage.setItem('phipilot_perfil', 'CONTROLADOR');
       hide('tela-login');
+      hide('tela-senha');
       iniciarApp();
     } else {
-      setErro('login-erro', d.erro || 'Token inválido.');
+      setErro('login-erro', 'Token não encontrado. Verifique e tente novamente.');
     }
-  }).catch(function() { setErro('login-erro','Erro de conexão.'); });
+  })
+  .catch(function() {
+    if (btnLogin) btnLogin.textContent = 'Entrar';
+    setErro('login-erro','Erro de conexão. Verifique a internet.');
+  });
 }
 
 function criarSenha() {
-  var nova = document.getElementById('inp-nova').value;
-  var conf = document.getElementById('inp-conf').value;
-  if (nova.length < 6) return setErro('senha-erro','Mínimo 6 caracteres.');
-  if (nova !== conf)   return setErro('senha-erro','Senhas não coincidem.');
-  apiPost({ action:'empregados.senha', token: S.token, senha: nova })
-  .then(function(d) {
-    if (d.ok) { hide('tela-senha'); iniciarApp(); }
-    else setErro('senha-erro', d.erro || 'Erro.');
-  });
+  hide('tela-senha');
+  show('tela-login');
 }
 
 // ── INICIAR APP ───────────────────────────────────────────
