@@ -1114,17 +1114,17 @@ function fazerLogin() {
   var btnLogin = document.querySelector('#tela-login .btn-login');
   if (btnLogin) btnLogin.textContent = 'Verificando...';
 
-  fetch(URL_SCRIPT + '?action=jornada.status&token=' + encodeURIComponent(token))
+  fetch(URL_SCRIPT + '?action=empregados.me&token=' + encodeURIComponent(token))
   .then(function(r) { return r.json(); })
   .then(function(d) {
     if (btnLogin) btnLogin.textContent = 'Entrar';
-    if (d.ok) {
+    if (d.ok && d.dados) {
       S.token  = token;
-      S.nome   = 'Thais';
-      S.perfil = 'CONTROLADOR';
+      S.nome   = d.dados.nome   || 'Usuário';
+      S.perfil = d.dados.perfil || 'CAPTADOR';
       localStorage.setItem('phipilot_token',  token);
-      localStorage.setItem('phipilot_nome',   'Thais');
-      localStorage.setItem('phipilot_perfil', 'CONTROLADOR');
+      localStorage.setItem('phipilot_nome',   S.nome);
+      localStorage.setItem('phipilot_perfil', S.perfil);
       hide('tela-login');
       hide('tela-senha');
       iniciarApp();
