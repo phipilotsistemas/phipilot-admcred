@@ -13,26 +13,27 @@
 ══════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; }
-body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
+body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text);
        min-height: 100vh; overflow-x: hidden; }
 
 :root {
-  --bg:        #0F172A;
-  --bg2:       #1E293B;
-  --surface:   #1E293B;
-  --surface2:  #263348;
-  --border:    rgba(255,255,255,0.07);
-  --border2:   rgba(255,255,255,0.12);
-  --text:      #F0F4FF;
-  --text-dim:  #94A3B8;
-  --text-muted:#475569;
-  --accent:    #6366F1;
-  --accent-lt: #818CF8;
-  --green:     #10B981;
-  --green-lt:  #34D399;
-  --amber:     #F59E0B;
-  --red:       #EF4444;
-  --blue:      #3B82F6;
+  --bg:        #F8FAFC;
+  --bg2:       #F1F5F9;
+  --surface:   #FFFFFF;
+  --surface2:  #F8F8F6;
+  --border:    #E2E8F0;
+  --border2:   #CBD5E1;
+  --text:      #0A0A0A;
+  --text-dim:  #475569;
+  --text-muted:#94A3B8;
+  --accent:    #FFAC1E;
+  --accent-lt: #FBB019;
+  --accent-dark:#CC8800;
+  --green:     #16A34A;
+  --green-lt:  #22C55E;
+  --amber:     #D97706;
+  --red:       #DC2626;
+  --blue:      #2563EB;
   --radius:    16px;
   --radius-sm: 10px;
   --sidebar-w: 220px;
@@ -46,34 +47,34 @@ body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
 #tela-login {
   min-height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; padding: 32px 20px;
-  background: radial-gradient(ellipse 70% 50% at 30% 20%, rgba(99,102,241,.15) 0%,transparent 70%),
-              radial-gradient(ellipse 50% 40% at 80% 80%, rgba(16,185,129,.08) 0%,transparent 70%),
-              var(--bg);
+  background: #0A0A0A;
 }
 .login-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing:.25em;
-  color: var(--text-muted); text-transform:uppercase; margin-bottom:12px; }
-.login-titulo { font-size:30px; font-weight:700; margin-bottom:6px; }
-.login-sub { font-size:13px; color:var(--text-dim); margin-bottom:40px; }
-.login-card { background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius); padding:32px 28px; width:100%; max-width:380px; }
+  color: #666; text-transform:uppercase; margin-bottom:12px; }
+.login-titulo { font-size:34px; font-weight:800; margin-bottom:4px; color:var(--accent);
+  letter-spacing:-.02em; }
+.login-sub { font-size:13px; color:#888; margin-bottom:40px; }
+.login-card { background:#161616; border:1px solid #2A2A2A;
+  border-radius:var(--radius); padding:32px 28px; width:100%; max-width:380px;
+  border-top:3px solid var(--accent); }
 .field-label { font-size:10px; font-weight:600; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--text-muted); margin-bottom:7px; display:block; }
-.field-input { width:100%; background:var(--surface2); border:1px solid var(--border);
+  text-transform:uppercase; color:#888; margin-bottom:7px; display:block; }
+.field-input { width:100%; background:#1E1E1E; border:1px solid #333;
   border-radius:var(--radius-sm); padding:13px 15px; font-family:var(--font-mono);
-  font-size:13px; color:var(--text); outline:none; transition:border-color .2s;
+  font-size:13px; color:#F0F0F0; outline:none; transition:border-color .2s;
   margin-bottom:18px; }
 .field-input:focus { border-color:var(--accent); }
-.field-input::placeholder { color:var(--text-muted); }
+.field-input::placeholder { color:#555; }
 .btn-login { width:100%; padding:15px; background:var(--accent); border:none;
   border-radius:var(--radius-sm); font-family:'Sora',sans-serif; font-size:14px;
-  font-weight:600; color:#fff; cursor:pointer; transition:opacity .2s; }
-.btn-login:hover { opacity:.9; }
+  font-weight:700; color:#0A0A0A; cursor:pointer; transition:all .2s; }
+.btn-login:hover { background:var(--accent-dark); }
 .login-erro { margin-top:14px; font-size:12px; color:var(--red); text-align:center; min-height:18px; }
 
 /* Primeira senha */
 #tela-senha { display:none; flex-direction:column; align-items:center;
   justify-content:center; min-height:100vh; padding:32px 20px;
-  background: var(--bg); }
+  background: #0A0A0A; }
 
 /* ══════════════════════════════════════════════════════════
    LAYOUT PRINCIPAL
@@ -83,49 +84,49 @@ body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
 /* ── SIDEBAR ── */
 .sidebar {
   position: fixed; left:0; top:0; bottom:0; width:var(--sidebar-w);
-  background: var(--surface); border-right:1px solid var(--border);
+  background: #0A0A0A; border-right:3px solid var(--accent);
   display:flex; flex-direction:column; z-index:50; overflow-y:auto;
 }
 .sidebar-brand {
   padding:20px 20px 16px;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #222;
 }
-.brand-logo { font-family:var(--font-mono); font-size:15px; font-weight:500;
-  color:var(--text); letter-spacing:-.01em; }
-.brand-tag { font-size:10px; color:var(--text-muted); font-family:var(--font-mono);
+.brand-logo { font-family:var(--font-mono); font-size:15px; font-weight:700;
+  color:var(--accent); letter-spacing:-.01em; }
+.brand-tag { font-size:10px; color:#888; font-family:var(--font-mono);
   letter-spacing:.1em; margin-top:2px; }
 .sidebar-user {
-  padding:14px 20px; border-bottom:1px solid var(--border);
+  padding:14px 20px; border-bottom:1px solid #222;
   display:flex; align-items:center; gap:10px;
 }
 .user-avatar {
   width:34px; height:34px; border-radius:50%; background:var(--accent);
   display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:700; flex-shrink:0;
+  font-size:13px; font-weight:700; flex-shrink:0; color:#0A0A0A;
 }
-.user-nome { font-size:12px; font-weight:600; color:var(--text); }
-.user-perfil { font-size:10px; color:var(--text-muted); font-family:var(--font-mono);
+.user-nome { font-size:12px; font-weight:600; color:#F0F0F0; }
+.user-perfil { font-size:10px; color:#888; font-family:var(--font-mono);
   text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
 
 .nav-section { padding:8px 0; }
 .nav-label { padding:8px 20px 4px; font-size:9px; font-weight:600;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); }
+  letter-spacing:.14em; text-transform:uppercase; color:#555; }
 .nav-item {
   display:flex; align-items:center; gap:10px; padding:10px 20px;
-  cursor:pointer; border-radius:0; transition:background .15s;
-  font-size:13px; color:var(--text-dim); border-left:3px solid transparent;
+  cursor:pointer; border-radius:0; transition:all .15s;
+  font-size:13px; color:#999; border-left:3px solid transparent;
   user-select:none;
 }
-.nav-item:hover { background:rgba(255,255,255,.04); color:var(--text); }
-.nav-item.active { background:rgba(99,102,241,.12); color:var(--accent-lt);
-  border-left-color:var(--accent); }
+.nav-item:hover { background:rgba(255,172,30,.08); color:#F0F0F0; }
+.nav-item.active { background:rgba(255,172,30,.15); color:var(--accent);
+  border-left-color:var(--accent); font-weight:600; }
 .nav-icon { font-size:15px; width:20px; text-align:center; flex-shrink:0; }
 
 .sidebar-footer {
-  margin-top:auto; padding:16px 20px; border-top:1px solid var(--border);
+  margin-top:auto; padding:16px 20px; border-top:1px solid #222;
 }
-.btn-sair { width:100%; padding:10px; background:transparent; border:1px solid var(--border);
-  border-radius:var(--radius-sm); font-size:12px; color:var(--text-dim);
+.btn-sair { width:100%; padding:10px; background:transparent; border:1px solid #333;
+  border-radius:var(--radius-sm); font-size:12px; color:#888;
   cursor:pointer; transition:all .2s; }
 .btn-sair:hover { border-color:var(--red); color:var(--red); }
 
@@ -134,22 +135,20 @@ body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
   margin-left:var(--sidebar-w);
   min-height:100vh;
   padding:28px 32px;
-  background:
-    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(99,102,241,.06) 0%,transparent 70%),
-    var(--bg);
+  background: var(--bg);
 }
 
 .page-header { margin-bottom:24px; }
-.page-titulo { font-size:22px; font-weight:700; color:var(--text); }
+.page-titulo { font-size:22px; font-weight:700; color:var(--text); border-left:4px solid var(--accent); padding-left:12px; }
 .page-sub { font-size:13px; color:var(--text-dim); margin-top:4px; }
 
 /* ── LOADING OVERLAY ── */
 .loading-overlay {
-  position:fixed; inset:0; background:var(--bg); display:flex;
+  position:fixed; inset:0; background:#0A0A0A; display:flex;
   align-items:center; justify-content:center; z-index:200;
 }
 .loading-overlay.hide { display:none; }
-.spinner { width:36px; height:36px; border:3px solid var(--border);
+.spinner { width:36px; height:36px; border:3px solid #333;
   border-top-color:var(--accent); border-radius:50%;
   animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -158,7 +157,7 @@ body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
 .card { background:var(--surface); border:1px solid var(--border);
   border-radius:var(--radius); padding:20px; }
 .card-titulo { font-size:11px; font-weight:600; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; }
+  text-transform:uppercase; color:var(--accent-dark); margin-bottom:16px; }
 
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
@@ -184,15 +183,15 @@ body { font-family: 'Sora', sans-serif; background: #0F172A; color: #F0F4FF;
 .badge-red    { background:rgba(239,68,68,.15);   color:var(--red);   }
 .badge-blue   { background:rgba(59,130,246,.15);  color:var(--blue);  }
 .badge-gray   { background:rgba(148,163,184,.1);  color:var(--text-dim); }
-.badge-accent { background:rgba(99,102,241,.15);  color:var(--accent-lt); }
+.badge-accent { background:rgba(255,172,30,.15);  color:var(--accent-dark); }
 
 /* ── TABELAS ── */
 .table-wrap { overflow-x:auto; border-radius:var(--radius);
   border:1px solid var(--border); }
 table { width:100%; border-collapse:collapse; }
-thead tr { background:var(--surface2); }
+thead tr { background:#0A0A0A; }
 th { padding:11px 16px; text-align:left; font-size:10px; font-weight:600;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted);
+  letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
   white-space:nowrap; }
 td { padding:12px 16px; font-size:13px; color:var(--text-dim);
   border-top:1px solid var(--border); }
@@ -203,8 +202,8 @@ tr:hover td { background:rgba(255,255,255,.02); }
 .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px;
   border-radius:var(--radius-sm); font-family:'Sora',sans-serif; font-size:13px;
   font-weight:600; cursor:pointer; transition:all .15s; border:none; }
-.btn-primary { background:var(--accent); color:#fff; }
-.btn-primary:hover { opacity:.9; }
+.btn-primary { background:var(--accent); color:#0A0A0A; font-weight:700; }
+.btn-primary:hover { background:var(--accent-dark); }
 .btn-secondary { background:var(--surface2); color:var(--text-dim); border:1px solid var(--border); }
 .btn-secondary:hover { color:var(--text); border-color:var(--border2); }
 .btn-danger  { background:rgba(239,68,68,.12); color:var(--red); border:1px solid rgba(239,68,68,.2); }
@@ -225,7 +224,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
   border-radius:var(--radius-sm); padding:11px 14px; font-family:'Sora',sans-serif;
   font-size:13px; color:var(--text); outline:none; transition:border-color .2s;
   width:100%; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--accent); }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,172,30,.12); }
 .form-input::placeholder { color:var(--text-muted); }
 .form-select { appearance:none; cursor:pointer; }
 .form-textarea { resize:vertical; min-height:80px; }
@@ -289,7 +288,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
 .pipeline-col { min-width:220px; flex-shrink:0; }
 .pipeline-header { padding:10px 14px; border-radius:var(--radius-sm) var(--radius-sm) 0 0;
   font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
-.pipeline-header.negociacao { background:rgba(59,130,246,.15); color:var(--blue); }
+.pipeline-header.negociacao { background:rgba(255,172,30,.12); color:var(--accent-dark); }
 .pipeline-header.contrato   { background:rgba(245,158,11,.15); color:var(--amber); }
 .pipeline-header.assinatura { background:rgba(99,102,241,.15); color:var(--accent-lt); }
 .pipeline-header.pagamento  { background:rgba(16,185,129,.15); color:var(--green); }
@@ -341,9 +340,16 @@ tr:hover td { background:rgba(255,255,255,.02); }
      TELA DE LOGIN
 ══════════════════════════════════════════════════════════ -->
 <div id="tela-login" style="display:none">
-  <div class="login-brand">PhiPilot Sistemas</div>
-  <div class="login-titulo">ADM CRED</div>
-  <div class="login-sub">Soluções Financeiras — Painel de Gestão</div>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+    <div style="width:56px;height:56px;background:var(--accent);border-radius:14px;
+      display:flex;align-items:center;justify-content:center;font-weight:900;
+      font-size:24px;color:#0A0A0A;font-family:var(--font-mono);">$</div>
+    <div>
+      <div class="login-titulo" style="margin-bottom:2px;">ADM CRED</div>
+      <div class="login-brand">SOLUÇÕES FINANCEIRAS</div>
+    </div>
+  </div>
+  <div class="login-sub" style="margin-top:4px;">Painel de Gestão · PhiPilot Sistemas</div>
   <div class="login-card">
     <label class="field-label" for="inp-token">Token de acesso</label>
     <input class="field-input" id="inp-token" type="text" placeholder="Seu token" autocomplete="off" autocapitalize="none">
@@ -381,8 +387,15 @@ tr:hover td { background:rgba(255,255,255,.02); }
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="brand-logo">PhiPilot</div>
-      <div class="brand-tag">ADM CRED · Gestão</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;
+          display:flex;align-items:center;justify-content:center;font-weight:900;
+          font-size:14px;color:#0A0A0A;font-family:var(--font-mono);flex-shrink:0;">$</div>
+        <div>
+          <div class="brand-logo">ADM CRED</div>
+          <div class="brand-tag">SOLUÇÕES FINANCEIRAS</div>
+        </div>
+      </div>
     </div>
     <div class="sidebar-user">
       <div class="user-avatar" id="user-avatar">?</div>
@@ -429,7 +442,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
           </div>
           <div class="form-group">
             <label class="form-label">Telefone / WhatsApp</label>
-            <input class="form-input" id="frio-tel" placeholder="(00) 00000-0000">
+            <input class="form-input" id="frio-tel" placeholder="(00) 00000-0000" data-mask="tel" maxlength="15">
           </div>
           <div class="form-group form-full">
             <label class="form-label">Observação</label>
@@ -623,7 +636,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Telefone / WhatsApp *</label>
-        <input class="form-input" id="nl-tel" placeholder="(00) 00000-0000">
+        <input class="form-input" id="nl-tel" placeholder="(00) 00000-0000" data-mask="tel" maxlength="15">
       </div>
       <div class="form-group">
         <label class="form-label">Vendedor *</label>
@@ -705,7 +718,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">CPF do cliente</label>
-        <input class="form-input" id="comp-cpf" placeholder="000.000.000-00">
+        <input class="form-input" id="comp-cpf" placeholder="000.000.000-00" data-mask="cpf" maxlength="14">
       </div>
       <div class="form-group">
         <label class="form-label">E-mail</label>
@@ -751,11 +764,11 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Valor do crédito (R$)</label>
-        <input class="form-input" id="comp-credito" type="number" placeholder="0,00" oninput="simularComissao()">
+        <input class="form-input" id="comp-credito" placeholder="R$ 0,00" data-mask="valor" oninput="simularComissao()">
       </div>
       <div class="form-group">
         <label class="form-label">Valor da parcela mensal (R$)</label>
-        <input class="form-input" id="comp-parcela" type="number" placeholder="0,00">
+        <input class="form-input" id="comp-parcela" placeholder="R$ 0,00" data-mask="valor">
       </div>
       <div class="form-group">
         <label class="form-label">Vencimento da parcela</label>
@@ -889,7 +902,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Valor (R$)</label>
-        <input class="form-input" id="bol-valor" type="number" placeholder="0,00">
+        <input class="form-input" id="bol-valor" placeholder="R$ 0,00" data-mask="valor">
       </div>
       <div class="form-group">
         <label class="form-label">Vencimento</label>
@@ -917,7 +930,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">CPF *</label>
-        <input class="form-input" id="emp-cpf" placeholder="000.000.000-00">
+        <input class="form-input" id="emp-cpf" placeholder="000.000.000-00" data-mask="cpf" maxlength="14">
       </div>
       <div class="form-group">
         <label class="form-label">RG</label>
@@ -929,7 +942,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Telefone</label>
-        <input class="form-input" id="emp-tel" placeholder="(00) 00000-0000">
+        <input class="form-input" id="emp-tel" placeholder="(00) 00000-0000" data-mask="tel" maxlength="15">
       </div>
       <div class="form-group">
         <label class="form-label">E-mail</label>
@@ -958,7 +971,7 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Salário base (R$)</label>
-        <input class="form-input" id="emp-salario" type="number" placeholder="0,00">
+        <input class="form-input" id="emp-salario" placeholder="R$ 0,00" data-mask="valor">
       </div>
       <div class="form-group">
         <label class="form-label">Jornada contratada (h/dia)</label>
@@ -1020,11 +1033,11 @@ tr:hover td { background:rgba(255,255,255,.02); }
       </div>
       <div class="form-group">
         <label class="form-label">Valor bruto (R$)</label>
-        <input class="form-input" id="fat-bruto" type="number" placeholder="0,00">
+        <input class="form-input" id="fat-bruto" placeholder="R$ 0,00" data-mask="valor">
       </div>
       <div class="form-group">
         <label class="form-label">Descontos / estornos (R$)</label>
-        <input class="form-input" id="fat-desc" type="number" placeholder="0,00">
+        <input class="form-input" id="fat-desc" placeholder="R$ 0,00" data-mask="valor">
       </div>
       <div class="form-group form-full">
         <label class="form-label">Observação</label>
@@ -1158,6 +1171,8 @@ function iniciarApp() {
   // Pré-carrega dados globais
   carregarAdministradoras();
   carregarVendedores();
+  // Aplica máscaras em todos os inputs
+  setTimeout(aplicarMascaras, 300);
 
   document.getElementById('app').style.display = 'block';
   hide('loading');
@@ -1308,9 +1323,7 @@ function carregarLeadsCaptador() {
     d.dados.forEach(function(l) {
       html += '<tr>' +
         '<td class="td-nome">' + esc(l.nome) + '</td>' +
-        '<td class="mono">' + esc(l.telefone) + ' ' +
-          '<a href="https://wa.me/55' + l.telefone.replace(/\D/g,'') +
-          '" target="_blank" style="color:var(--green);text-decoration:none;">📱</a></td>' +
+        '<td>' + btnWhatsApp(l.telefone, l.nome) + '</td>' +
         '<td class="text-muted mono">' + esc(l.data_criacao||'—') + '</td>' +
         '<td><button class="btn btn-sm btn-primary" onclick="abrirEnvioLead(' +
           JSON.stringify(l).replace(/"/g,'&quot;') + ')">Enviar ›</button></td>' +
@@ -1541,7 +1554,7 @@ function salvarComplemento() {
     id_administradora: val('comp-adm'), id_grupo: val('comp-grupo'),
     numero_cota: val('comp-cota'), produto: val('comp-produto'),
     objetivo_consorcio: val('comp-objetivo'),
-    valor_credito: val('comp-credito'), valor_parcela_mensal: val('comp-parcela'),
+    valor_credito: limparValor(val('comp-credito')), valor_parcela_mensal: limparValor(val('comp-parcela')),
     data_vencimento_parcela: val('comp-vencimento')
   };
   var idAdm = val('comp-adm');
@@ -1710,7 +1723,7 @@ function lancarBoleto() {
     id_administradora:'',
     numero_contrato: val('bol-contrato'),
     numero_parcela:  val('bol-parcela'),
-    valor:           val('bol-valor'),
+    valor:           limparValor(val('bol-valor')),
     data_vencimento: val('bol-vencimento')
   };
   if (!body.id_cliente || !body.valor || !body.data_vencimento)
@@ -1847,8 +1860,9 @@ function carregarEmpregados() {
         '<td class="td-nome">' + esc(e.nome) + '</td>' +
         '<td>' + esc(e.cargo||'—') + '</td>' +
         '<td><span class="badge badge-accent">' + esc(e.perfil) + '</span></td>' +
-        '<td class="mono">' + esc(e.data_admissao||'—') + '</td>' +
+        '<td class="mono">' + esc(String(e.data_admissao||'—').substring(0,10)) + '</td>' +
         '<td class="mono">' + esc(String(e.percentual_comissao||0)) + '%</td>' +
+        '<td>' + btnWhatsApp(e.telefone, e.nome) + '</td>' +
         '<td>' + badgeStatus(e.status) + '</td>' +
         '<td><select class="form-select" style="width:120px;padding:5px 8px;font-size:12px;" ' +
           'onchange="alterarStatusEmp(\'' + e.id + '\',this.value)">' +
@@ -1917,7 +1931,7 @@ function renderizarTabelaClientes(lista) {
   lista.forEach(function(l) {
     html += '<tr>' +
       '<td class="td-nome">' + esc(l.nome) + '</td>' +
-      '<td class="mono">' + esc(l.telefone||'—') + '</td>' +
+      '<td>' + btnWhatsApp(l.telefone, l.nome) + '</td>' +
       '<td>' + badgeFunil(l.status_funil) + '</td>' +
       '<td>' + badgeCota(l.status_cota) + '</td>' +
       '<td>' + esc(l.nome_administradora||'—') + '</td>' +
@@ -2078,8 +2092,8 @@ function salvarFaturamento() {
     nome_administradora: adm ? adm.nome : '',
     periodo:             val('fat-periodo'),
     contratos_liquidados:val('fat-contratos'),
-    valor_bruto:         val('fat-bruto'),
-    descontos:           val('fat-desc') || 0,
+    valor_bruto:         limparValor(val('fat-bruto')),
+    descontos:           limparValor(val('fat-desc')) || 0,
     observacao:          val('fat-obs')
   }).then(function(d) {
     if (d.ok) { toast('✅ Faturamento lançado.'); fecharModal('modal-lancar-fat'); carregarFinanceiro(); }
@@ -2220,6 +2234,57 @@ function sair() {
   localStorage.removeItem('phipilot_nome');
   localStorage.removeItem('phipilot_perfil');
   location.reload();
+}
+
+
+// ── MÁSCARAS DE INPUT ─────────────────────────────────────
+function mascaraCPF(v) {
+  v = v.replace(/\D/g,'').substring(0,11);
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  return v;
+}
+function mascaraTel(v) {
+  v = v.replace(/\D/g,'').substring(0,11);
+  if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else                v = v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  return v;
+}
+function mascaraValor(v) {
+  v = v.replace(/\D/g,'');
+  if (!v) return '';
+  v = (parseInt(v,10)/100).toFixed(2);
+  return 'R$ ' + v.replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function limparValor(v) {
+  // Remove R$, pontos e troca vírgula por ponto para enviar ao backend
+  return v.replace(/[R$\s.]/g,'').replace(',','.');
+}
+function aplicarMascaras() {
+  // CPF
+  document.querySelectorAll('input[data-mask="cpf"]').forEach(function(el) {
+    el.addEventListener('input', function() { this.value = mascaraCPF(this.value); });
+  });
+  // Telefone
+  document.querySelectorAll('input[data-mask="tel"]').forEach(function(el) {
+    el.addEventListener('input', function() { this.value = mascaraTel(this.value); });
+  });
+  // Valor
+  document.querySelectorAll('input[data-mask="valor"]').forEach(function(el) {
+    el.addEventListener('input', function() { this.value = mascaraValor(this.value); });
+  });
+}
+
+// ── WHATSAPP LINK ──────────────────────────────────────────
+function btnWhatsApp(telefone, nome) {
+  var num = (telefone || '').replace(/\D/g,'');
+  if (!num) return '—';
+  var msg = encodeURIComponent('Olá ' + (nome||'') + '! Entrando em contato pela ADM CRED.');
+  return '<a href="https://wa.me/55' + num + '?text=' + msg + '" target="_blank" ' +
+    'style="display:inline-flex;align-items:center;gap:4px;color:#25D366;text-decoration:none;font-weight:600;font-size:12px;">' +
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>' +
+    'WhatsApp</a>';
 }
 
 // Enter no login
