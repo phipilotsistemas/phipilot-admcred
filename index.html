@@ -1120,17 +1120,12 @@ function fazerLogin() {
       S.nome   = 'Thais';
       S.perfil = 'CONTROLADOR';
       localStorage.setItem('phipilot_token',  token);
-      localStorage.setItem('phipilot_nome',   d.dados.nome);
-      localStorage.setItem('phipilot_perfil', d.dados.perfil);
+      localStorage.setItem('phipilot_nome',   'Thais');
+      localStorage.setItem('phipilot_perfil', 'CONTROLADOR');
       hide('tela-login');
       iniciarApp();
     } else {
-      // 1º acesso
-      document.getElementById('token-display').textContent = token;
-      S.token = token;
-      hide('tela-login');
-      show('tela-senha');
-      hide('loading');
+      setErro('login-erro', d.erro || 'Token inválido.');
     }
   }).catch(function() { setErro('login-erro','Erro de conexão.'); });
 }
