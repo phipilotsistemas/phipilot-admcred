@@ -1850,29 +1850,37 @@ function carregarEmpregados() {
   var el = document.getElementById('lista-empregados');
   el.innerHTML = '<div class="skeleton" style="height:200px;"></div>';
   api('empregados.listar').then(function(d) {
-    if (!d.ok) { el.innerHTML = emptyState('👥','Erro ao carregar.'); return; }
-    var statusOpts = ['ativo','ferias','atestado','inss','licenca','desligado'];
-    var html = '<div class="table-wrap"><table><thead><tr>' +
-      '<th>Nome</th><th>Cargo</th><th>Perfil</th><th>Admissão</th>' +
-      '<th>% Comissão</th><th>Status</th><th>Ação</th></tr></thead><tbody>';
-    d.dados.forEach(function(e) {
-      html += '<tr>' +
-        '<td class="td-nome">' + esc(e.nome) + '</td>' +
-        '<td>' + esc(e.cargo||'—') + '</td>' +
-        '<td><span class="badge badge-accent">' + esc(e.perfil) + '</span></td>' +
-        '<td class="mono">' + esc(String(e.data_admissao||'—').substring(0,10)) + '</td>' +
-        '<td class="mono">' + esc(String(e.percentual_comissao||0)) + '%</td>' +
-        '<td>' + btnWhatsApp(e.telefone, e.nome) + '</td>' +
-        '<td>' + badgeStatus(e.status) + '</td>' +
-        '<td><select class="form-select" style="width:120px;padding:5px 8px;font-size:12px;" ' +
-          'onchange="alterarStatusEmp(\'' + e.id + '\',this.value)">' +
-          statusOpts.map(function(s) {
-            return '<option value="' + s + '"' + (e.status===s?' selected':'') + '>' + s + '</option>';
-          }).join('') +
-        '</select></td></tr>';
-    });
-    html += '</tbody></table></div>';
-    el.innerHTML = html;
+    try {
+      if (!d.ok) { el.innerHTML = emptyState('\u{1F465}','Erro: ' + (d.erro||'sem detalhes')); return; }
+      if (!d.dados || !d.dados.length) { el.innerHTML = emptyState('\u{1F465}','Nenhum empregado cadastrado.'); return; }
+      var statusOpts = ['ativo','ferias','atestado','inss','licenca','desligado'];
+      var rows = '';
+      d.dados.forEach(function(e) {
+        var admissao = (String(e.data_admissao||'')).substring(0,10) || '\u2014';
+        var statusSel = statusOpts.map(function(s) {
+          return '<option value="' + s + '"' + (e.status===s?' selected':'') + '>' + s + '</option>';
+        }).join('');
+        rows += '<tr>' +
+          '<td class="td-nome">' + esc(e.nome||'') + '</td>' +
+          '<td>' + esc(e.cargo||'\u2014') + '</td>' +
+          '<td><span class="badge badge-accent">' + esc(e.perfil||'') + '</span></td>' +
+          '<td class="mono">' + esc(admissao) + '</td>' +
+          '<td class="mono">' + esc(String(e.percentual_comissao||'0')) + '%</td>' +
+          '<td>' + btnWhatsApp(String(e.telefone||''), e.nome) + '</td>' +
+          '<td>' + badgeStatus(e.status) + '</td>' +
+          '<td><select class="form-select" style="width:120px;padding:5px 8px;font-size:12px;" ' +
+            'onchange="alterarStatusEmp(\'' + esc(String(e.id||'')) + '\',this.value)">' +
+            statusSel + '</select></td></tr>';
+      });
+      el.innerHTML = '<div class="table-wrap"><table><thead><tr>' +
+        '<th>Nome</th><th>Cargo</th><th>Perfil</th><th>Admiss\u00e3o</th>' +
+        '<th>% Comiss\u00e3o</th><th>WhatsApp</th><th>Status</th><th>A\u00e7\u00e3o</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+    } catch(err) {
+      el.innerHTML = emptyState('\u{1F465}','Erro de renderiza\u00e7\u00e3o: ' + err.message);
+    }
+  }).catch(function(err) {
+    el.innerHTML = emptyState('\u{1F465}','Erro de conex\u00e3o: ' + err.message);
   });
 }
 
