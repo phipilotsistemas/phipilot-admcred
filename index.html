@@ -520,6 +520,25 @@ tr:hover td { background:rgba(255,255,255,.02); }
     </div>
 
     <!-- ── THAIS (CONTROLADOR) ────────────────────────────── -->
+    <!-- ── METAS ───────────────────────────────────────────── -->
+    <div id="aba-ctrl-metas" class="aba-content">
+      <div class="page-header flex-between">
+        <div>
+          <div class="page-titulo">Metas</div>
+          <div class="page-sub" id="metas-periodo-label">Carregando...</div>
+        </div>
+        <div class="flex gap-8" style="align-items:center;">
+          <select class="form-select" id="metas-mes-sel" style="width:160px;" onchange="carregarMetas()">
+          </select>
+          <button class="btn btn-secondary" onclick="abrirDefinirMetas()">⚙️ Definir metas</button>
+          <button class="btn btn-primary" onclick="carregarMetas()">↻ Atualizar</button>
+        </div>
+      </div>
+      <div id="metas-resumo" class="grid-4 mb-24"></div>
+      <div id="metas-alertas" class="mb-24"></div>
+      <div id="metas-grid"></div>
+    </div>
+
     <div id="aba-ctrl-dashboard" class="aba-content">
       <div class="page-header">
         <div class="page-titulo">Dashboard</div>
@@ -607,6 +626,22 @@ tr:hover td { background:rgba(255,255,255,.02); }
       <div id="financeiro-comissoes"></div>
     </div>
 
+
+    <!-- ── RH: MONITOR DIÁRIO ──────────────────────────────── -->
+    <div id="aba-rh-monitor" class="aba-content">
+      <div class="page-header flex-between">
+        <div>
+          <div class="page-titulo">Monitor Diário</div>
+          <div class="page-sub" id="monitor-data-label">Jornada de hoje — carregando...</div>
+        </div>
+        <div class="flex gap-8" style="align-items:center;">
+          <input class="form-input" id="monitor-data" type="date" style="width:160px;" onchange="carregarMonitorDiario()">
+          <button class="btn btn-primary" onclick="carregarMonitorDiario()">↻ Atualizar</button>
+        </div>
+      </div>
+      <div id="monitor-resumo" class="grid-4 mb-24"></div>
+      <div id="monitor-grid"></div>
+    </div>
 
     <!-- ── RH: ALERTAS ─────────────────────────────────────── -->
     <div id="aba-rh-alertas" class="aba-content">
@@ -1249,47 +1284,92 @@ tr:hover td { background:rgba(255,255,255,.02); }
   </div>
 </div>
 
-<!-- Modal Inserir Ponto Manual -->
+<!-- Modal Inserir Ponto Manual — Fluxo 2 etapas -->
 <div class="modal-overlay" id="modal-inserir-ponto">
-  <div class="modal" style="max-width:440px;">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <span class="modal-titulo">Inserir Ponto Manual</span>
       <button class="modal-fechar" onclick="fecharModal('modal-inserir-ponto')">✕</button>
     </div>
-    <div class="alerta-blue alerta-box" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);">
-      <span class="alerta-icon">ℹ️</span>
-      <span class="alerta-txt">Inserção registrada no log de auditoria com seu nome e horário.</span>
+
+    <!-- ETAPA 1: Preencher dados e gerar termo -->
+    <div id="mp-etapa1">
+      <div class="alerta-amber alerta-box">
+        <span class="alerta-icon">⚠️</span>
+        <span class="alerta-txt"><strong>Etapa 1 de 2:</strong> Preencha os dados, gere o termo, imprima e colha a assinatura do empregado antes de confirmar a inserção.</span>
+      </div>
+      <div class="form-grid mt-16">
+        <div class="form-group form-full">
+          <label class="form-label">Empregado *</label>
+          <select class="form-select" id="mp-emp"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data *</label>
+          <input class="form-input" id="mp-data" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horário *</label>
+          <input class="form-input" id="mp-hora" type="time">
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label">Tipo de evento *</label>
+          <select class="form-select" id="mp-tipo">
+            <option value="entrada">Entrada</option>
+            <option value="saida_almoco">Saída almoço</option>
+            <option value="retorno_almoco">Retorno almoço</option>
+            <option value="encerramento">Encerramento</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label">Motivo *</label>
+          <textarea class="form-textarea" id="mp-obs" placeholder="Ex: Empregado esqueceu de registrar a entrada..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModal('modal-inserir-ponto')">Cancelar</button>
+        <button class="btn btn-primary" onclick="gerarTermoAbono()">📄 Gerar Termo de Abono</button>
+      </div>
     </div>
-    <div class="form-grid mt-16">
-      <div class="form-group form-full">
-        <label class="form-label">Empregado *</label>
-        <select class="form-select" id="mp-emp"></select>
+
+    <!-- ETAPA 2: Confirmar após assinatura -->
+    <div id="mp-etapa2" style="display:none;">
+      <div class="alerta-verde alerta-box" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);">
+        <span class="alerta-icon">✅</span>
+        <div class="alerta-txt">
+          <strong>Termo gerado com sucesso!</strong><br>
+          <a id="mp-link-termo" href="#" target="_blank" style="color:var(--green);font-weight:600;">📄 Abrir PDF do Termo</a>
+          <br><span style="font-size:12px;">Imprima, colha a assinatura do empregado e depois confirme a inserção abaixo.</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Data *</label>
-        <input class="form-input" id="mp-data" type="date">
+      <div class="alerta-box" style="background:rgba(255,172,30,.08);border:1px solid rgba(255,172,30,.2);margin-top:12px;">
+        <span class="alerta-icon">🔒</span>
+        <span class="alerta-txt" style="font-size:12px;">A inserção ficará marcada como <strong>MANUAL</strong> no histórico de jornada com data, hora e seu nome.</span>
       </div>
-      <div class="form-group">
-        <label class="form-label">Horário *</label>
-        <input class="form-input" id="mp-hora" type="time">
+      <div class="modal-footer" style="margin-top:16px;">
+        <button class="btn btn-secondary" onclick="voltarEtapa1()">← Voltar</button>
+        <button class="btn btn-primary" onclick="confirmarInsercaoManual()">✅ Confirmar inserção</button>
       </div>
-      <div class="form-group form-full">
-        <label class="form-label">Tipo de evento *</label>
-        <select class="form-select" id="mp-tipo">
-          <option value="entrada">Entrada</option>
-          <option value="saida_almoco">Saída almoço</option>
-          <option value="retorno_almoco">Retorno almoço</option>
-          <option value="encerramento">Encerramento</option>
-        </select>
-      </div>
-      <div class="form-group form-full">
-        <label class="form-label">Motivo da inserção manual</label>
-        <textarea class="form-textarea" id="mp-obs" placeholder="Ex: Empregado esqueceu de registrar a entrada..."></textarea>
-      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Definir Metas -->
+<div class="modal-overlay" id="modal-definir-metas">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <span class="modal-titulo">Definir Metas do Mês</span>
+      <button class="modal-fechar" onclick="fecharModal('modal-definir-metas')">✕</button>
+    </div>
+    <div class="alerta-box alerta-amber" style="margin-bottom:16px;">
+      <span class="alerta-icon">💡</span>
+      <span class="alerta-txt">Se não alterar, as metas do mês anterior serão mantidas automaticamente.</span>
+    </div>
+    <div id="modal-metas-content">
+      <div class="skeleton" style="height:200px;"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="fecharModal('modal-inserir-ponto')">Cancelar</button>
-      <button class="btn btn-primary" onclick="inserirPontoManual()">Inserir</button>
+      <button class="btn btn-secondary" onclick="fecharModal('modal-definir-metas')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMetas()">💾 Salvar metas</button>
     </div>
   </div>
 </div>
@@ -1336,6 +1416,7 @@ var MENUS = {
   ],
   CONTROLADOR: [
     { label:'VISÃO GERAL', type:'section' },
+    { id:'ctrl-metas',        icon:'🎯', label:'Metas' },
     { id:'ctrl-dashboard',    icon:'📊', label:'Dashboard' },
     { id:'ctrl-produtividade',icon:'📈', label:'Produtividade' },
     { id:'ctrl-retencao',     icon:'🔁', label:'Retenção' },
@@ -1346,6 +1427,7 @@ var MENUS = {
     { id:'ctrl-empregados',   icon:'👥', label:'Empregados' },
     { label:'RH', type:'section' },
     { id:'rh-alertas',       icon:'🚨', label:'Alertas RH' },
+    { id:'rh-monitor',        icon:'🖥️',  label:'Monitor Diário' },
     { id:'rh-frequencia',     icon:'📅', label:'Frequência' },
     { id:'rh-banco-horas',    icon:'⏱️', label:'Banco de Horas' },
     { id:'rh-advertencias',   icon:'⚠️', label:'Advertências' },
@@ -1470,6 +1552,7 @@ function navegar(id) {
     'adm-pagamentos':      carregarPagamentos,
     'adm-lances':          carregarOportunidades,
     'adm-calendario':      carregarCalendario,
+    'ctrl-metas':          carregarMetas,
     'ctrl-dashboard':      carregarDashboard,
     'ctrl-empregados':     carregarEmpregados,
     'ctrl-clientes':       carregarClientesCtrl,
@@ -1479,6 +1562,7 @@ function navegar(id) {
     'ctrl-financeiro':     carregarFinanceiro,
     'ctrl-config':         carregarConfig,
     'rh-alertas':          carregarRHAlertas,
+    'rh-monitor':          carregarMonitorDiario,
     'rh-frequencia':       carregarRHFrequencia,
     'rh-banco-horas':      carregarRHBancoHoras,
     'rh-advertencias':     carregarRHAdvertencias,
@@ -2649,581 +2733,3 @@ document.getElementById('inp-senha').addEventListener('keydown', function(e) {
 </script>
 </body>
 </html>
-<script>
-// ── MÓDULO RH — FUNÇÕES JAVASCRIPT ─────────────────────────────
-
-// Preenche selects de empregados nos modais RH
-function preencherSelectsRH(lista) {
-  var ids = ['freq-emp','bh-emp','pront-emp','adv-emp','adv-filtro-emp','ate-emp','mp-emp'];
-  ids.forEach(function(id) {
-    var sel = document.getElementById(id);
-    if (!sel) return;
-    var val = sel.value;
-    sel.innerHTML = id === 'adv-filtro-emp' ?
-      '<option value="">Todos</option>' :
-      '<option value="">Selecione...</option>';
-    lista.forEach(function(e) {
-      var opt = document.createElement('option');
-      opt.value = e.id;
-      opt.textContent = e.nome + ' (' + e.perfil + ')';
-      sel.appendChild(opt);
-    });
-    if (val) sel.value = val;
-  });
-}
-
-// Override do carregarEmpregados para também preencher selects RH
-var _origCarregarEmpregados = carregarEmpregados;
-function carregarEmpregados() {
-  _origCarregarEmpregados();
-  api('empregados.listar').then(function(d) {
-    if (d.ok) preencherSelectsRH(d.dados);
-  });
-}
-
-// ── FREQUÊNCIA ──────────────────────────────────────────────
-function carregarRHFrequencia() {
-  // Preenche selects se vazios
-  api('empregados.listar').then(function(d) { if (d.ok) preencherSelectsRH(d.dados); });
-
-  var idEmp   = val('freq-emp');
-  var periodo = document.getElementById('freq-periodo').value;
-  if (!idEmp) {
-    document.getElementById('freq-resumo').innerHTML = '';
-    document.getElementById('freq-tabela').innerHTML =
-      emptyState('📅','Selecione um empregado para ver a frequência.');
-    return;
-  }
-  var periodoFmt = periodo ? periodo.split('-')[1] + '/' + periodo.split('-')[0] : '';
-
-  document.getElementById('freq-tabela').innerHTML =
-    '<div class="skeleton" style="height:200px;"></div>';
-
-  api('rh.frequencia', { id_empregado: idEmp, periodo: periodoFmt })
-  .then(function(d) {
-    if (!d.ok) { document.getElementById('freq-tabela').innerHTML = emptyState('📅', d.erro||'Erro.'); return; }
-    var f = d.frequencia;
-
-    // Resumo
-    document.getElementById('freq-resumo').innerHTML =
-      statCard('Dias trabalhados', f.dias_trabalhados, 'verde', '') +
-      statCard('Atestados', f.atestados.length, 'amber', '') +
-      statCard('Irregulares', f.irregulares.length, 'red', 'dias sem registro completo') +
-      statCard('Período', periodoFmt || 'Geral', 'blue', '');
-
-    // Tabela por dia
-    if (!Object.keys(f.por_dia).length) {
-      document.getElementById('freq-tabela').innerHTML = emptyState('📅','Nenhum registro no período.');
-      return;
-    }
-
-    var rows = '';
-    Object.keys(f.por_dia).sort().forEach(function(data) {
-      var dia = f.por_dia[data];
-      var eventos = Array.isArray(dia) ? dia : [];
-      var entrada    = eventos.find(function(e){return e.tipo==='entrada';});
-      var sAlm       = eventos.find(function(e){return e.tipo==='saida_almoco';});
-      var rAlm       = eventos.find(function(e){return e.tipo==='retorno_almoco';});
-      var encerr     = eventos.find(function(e){return e.tipo==='encerramento';});
-      var completo   = dia.completo !== false;
-      var horas      = dia.horas_trabalhadas || '—';
-
-      rows += '<tr>' +
-        '<td class="mono bold">' + esc(data) + '</td>' +
-        '<td class="mono">' + (entrada ? entrada.hora : '<span class="text-muted">—</span>') + '</td>' +
-        '<td class="mono">' + (sAlm    ? sAlm.hora    : '<span class="text-muted">—</span>') + '</td>' +
-        '<td class="mono">' + (rAlm    ? rAlm.hora    : '<span class="text-muted">—</span>') + '</td>' +
-        '<td class="mono">' + (encerr  ? encerr.hora  : '<span class="text-muted">—</span>') + '</td>' +
-        '<td class="mono bold" style="color:var(--green);">' + esc(horas) + '</td>' +
-        '<td>' + (completo ?
-          '<span class="badge badge-verde">Regular</span>' :
-          '<span class="badge badge-red">Incompleto</span>') + '</td>' +
-        '</tr>';
-    });
-
-    document.getElementById('freq-tabela').innerHTML =
-      '<div class="table-wrap"><table><thead><tr>' +
-      '<th>Data</th><th>Entrada</th><th>Saída almoço</th><th>Retorno</th>' +
-      '<th>Encerramento</th><th>Total</th><th>Status</th>' +
-      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
-
-    // Atestados do período
-    if (f.atestados.length) {
-      var atRows = f.atestados.map(function(a) {
-        return '<tr><td>' + esc(a.tipo) + '</td><td class="mono">' + esc(a.data_inicio) +
-          '</td><td class="mono">' + esc(a.data_fim) + '</td><td>' + esc(a.dias) +
-          ' dias</td><td>' + esc(a.descricao||'—') + '</td></tr>';
-      }).join('');
-      document.getElementById('freq-tabela').innerHTML +=
-        '<div class="card-titulo mt-16" style="color:var(--amber);">Atestados no período</div>' +
-        '<div class="table-wrap"><table><thead><tr>' +
-        '<th>Tipo</th><th>Início</th><th>Fim</th><th>Dias</th><th>Descrição</th>' +
-        '</tr></thead><tbody>' + atRows + '</tbody></table></div>';
-    }
-  });
-}
-
-// ── BANCO DE HORAS ──────────────────────────────────────────
-function carregarRHBancoHoras() {
-  api('empregados.listar').then(function(d) { if (d.ok) preencherSelectsRH(d.dados); });
-
-  var idEmp   = val('bh-emp');
-  var periodo = document.getElementById('bh-periodo').value;
-  if (!idEmp) {
-    document.getElementById('bh-saldo').innerHTML = '';
-    document.getElementById('bh-tabela').innerHTML =
-      emptyState('⏱️','Selecione um empregado.');
-    return;
-  }
-  var periodoFmt = periodo ? periodo.split('-')[1] + '/' + periodo.split('-')[0] : '';
-
-  document.getElementById('bh-tabela').innerHTML = '<div class="skeleton" style="height:200px;"></div>';
-
-  api('rh.banco_horas', { id_empregado: idEmp, periodo: periodoFmt })
-  .then(function(d) {
-    if (!d.ok) { document.getElementById('bh-tabela').innerHTML = emptyState('⏱️', d.erro||'Erro.'); return; }
-    var b = d.banco_horas;
-
-    // Card saldo
-    var corSaldo = b.saldo_positivo ? 'verde' : 'red';
-    document.getElementById('bh-saldo').innerHTML =
-      '<div class="card" style="max-width:400px;">' +
-        '<div class="card-titulo">Saldo do banco de horas</div>' +
-        '<div style="font-family:var(--font-mono);font-size:40px;font-weight:700;' +
-          'color:' + (b.saldo_positivo ? 'var(--green)' : 'var(--red)') + ';">' +
-          esc(b.saldo_total) + '</div>' +
-        '<div class="text-muted" style="margin-top:8px;">Jornada contratada: ' +
-          b.jornada_contratada + 'h/dia &nbsp;|&nbsp; Período: ' + (periodoFmt||'Geral') + '</div>' +
-      '</div>';
-
-    if (!b.detalhes.length) {
-      document.getElementById('bh-tabela').innerHTML = emptyState('⏱️','Nenhum registro.');
-      return;
-    }
-
-    var rows = b.detalhes.map(function(d) {
-      var cls = d.status === 'extra' ? 'badge-verde' : d.status === 'deficit' ? 'badge-red' : 'badge-gray';
-      return '<tr>' +
-        '<td class="mono bold">' + esc(d.data) + '</td>' +
-        '<td class="mono">' + esc(d.trabalhado) + '</td>' +
-        '<td class="mono">' + esc(d.contratado) + '</td>' +
-        '<td class="mono bold" style="color:' + (d.positivo ? 'var(--green)' : 'var(--red)') + ';">' +
-          esc(d.saldo) + '</td>' +
-        '<td><span class="badge ' + cls + '">' + esc(d.status) + '</span></td>' +
-        '</tr>';
-    }).join('');
-
-    document.getElementById('bh-tabela').innerHTML =
-      '<div class="table-wrap"><table><thead><tr>' +
-      '<th>Data</th><th>Trabalhado</th><th>Contratado</th><th>Saldo do dia</th><th>Status</th>' +
-      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
-  });
-}
-
-// ── ADVERTÊNCIAS ────────────────────────────────────────────
-function carregarRHAdvertencias() {
-  api('empregados.listar').then(function(d) { if (d.ok) preencherSelectsRH(d.dados); });
-
-  var idEmp = val('adv-filtro-emp');
-  var el    = document.getElementById('adv-lista');
-  el.innerHTML = '<div class="skeleton" style="height:200px;"></div>';
-
-  api('rh.advertencias', { id_empregado: idEmp })
-  .then(function(d) {
-    if (!d.ok || !d.dados.length) {
-      el.innerHTML = emptyState('⚠️','Nenhuma advertência registrada.');
-      return;
-    }
-    var rows = d.dados.map(function(a) {
-      var grauCls = a.grau == 1 ? 'badge-amber' : a.grau == 2 ? 'badge-red' : 'badge-red';
-      return '<tr>' +
-        '<td class="mono bold">' + esc(String(a.numero)) + '</td>' +
-        '<td class="td-nome">' + esc(a.nome_empregado) + '</td>' +
-        '<td class="mono">' + esc(formatarDataBR(a.data_infracao)) + '</td>' +
-        '<td>' + esc(a.tipo_infracao) + '</td>' +
-        '<td><span class="badge ' + grauCls + '">' + esc(a.grau_texto) + '</span></td>' +
-        '<td><span class="badge ' + (a.status==='emitida'?'badge-amber':'badge-verde') + '">' +
-          esc(a.status) + '</span></td>' +
-        '<td>' + (a.arquivo_pdf_url ?
-          '<a href="' + esc(a.arquivo_pdf_url) + '" target="_blank" class="btn btn-xs btn-secondary">📄 PDF</a>' :
-          '<button class="btn btn-xs btn-secondary" onclick="regenarPDF(\'' + esc(a.id) + '\')">Gerar PDF</button>') +
-        '</td></tr>';
-    }).join('');
-
-    el.innerHTML = '<div class="table-wrap"><table><thead><tr>' +
-      '<th>Nº</th><th>Empregado</th><th>Data</th><th>Infração</th>' +
-      '<th>Grau</th><th>Status</th><th>PDF</th>' +
-      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
-  });
-}
-
-// Preview grau ao selecionar empregado
-function previewGrauAdvertencia() {
-  var idEmp = val('adv-emp');
-  if (!idEmp) return;
-  api('rh.advertencias', { id_empregado: idEmp }).then(function(d) {
-    if (!d.ok) return;
-    var total = d.dados.filter(function(a) { return a.status !== 'cancelada'; }).length + 1;
-    var grauTexto, cor;
-    if (total === 1)      { grauTexto = '1ª advertência → Verbal';          cor = 'badge-amber'; }
-    else if (total === 2) { grauTexto = '2ª advertência → Escrita';         cor = 'badge-red';   }
-    else if (total === 3) { grauTexto = '3ª advertência → Escrita (2ª)';    cor = 'badge-red';   }
-    else if (total === 4) { grauTexto = '4ª advertência → SUSPENSÃO';       cor = 'badge-red';
-      document.getElementById('dias-suspensao-wrap').style.display = 'block'; }
-    else                  { grauTexto = '5ª+ advertência → JUSTA CAUSA';    cor = 'badge-red';
-      document.getElementById('dias-suspensao-wrap').style.display = 'none'; }
-
-    var prev = document.getElementById('adv-grau-preview');
-    prev.style.display = 'block';
-    prev.innerHTML = '<div class="alerta-box alerta-red" style="margin:0;">' +
-      '<span class="alerta-icon">⚖️</span>' +
-      '<span class="alerta-txt">Esta será a <strong>' + total + 'ª advertência</strong> do empregado: ' +
-      '<span class="badge ' + cor + '" style="margin-left:6px;">' + grauTexto + '</span></span></div>';
-  });
-}
-
-function emitirAdvertencia() {
-  var idEmp  = val('adv-emp');
-  var data   = val('adv-data');
-  var tipo   = val('adv-tipo');
-  var desc   = val('adv-desc');
-  var contra = val('adv-contra');
-
-  if (!idEmp)  return toast('⚠️ Selecione o empregado.');
-  if (!data)   return toast('⚠️ Informe a data da infração.');
-  if (!tipo)   return toast('⚠️ Selecione o tipo de infração.');
-  if (!desc)   return toast('⚠️ Descreva o fato ocorrido.');
-
-  var btn = document.getElementById('btn-emitir-adv');
-  btn.textContent = '⏳ Emitindo...';
-  btn.disabled = true;
-
-  var diasSusp = val('adv-dias-susp') || '1';
-  apiPost({
-    action: 'rh.advertencia.emitir',
-    id_empregado:   idEmp,
-    data_infracao:  data,
-    tipo_infracao:  tipo,
-    descricao:      desc,
-    contraditorio:  contra,
-    dias_suspensao: diasSusp
-  }).then(function(d) {
-    btn.textContent = '⚠️ Emitir advertência';
-    btn.disabled = false;
-    if (d.ok) {
-      fecharModal('modal-advertencia');
-      toast('✅ Advertência nº ' + d.numero + ' emitida — ' + d.grau_texto);
-      if (d.pdf_url) {
-        setTimeout(function() {
-          window.open(d.pdf_url, '_blank');
-        }, 500);
-      }
-      carregarRHAdvertencias();
-    } else toast('❌ ' + d.erro);
-  });
-}
-
-function regenarPDF(idAdv) {
-  toast('⏳ Gerando PDF...');
-  apiPost({ action: 'rh.advertencia.pdf', id_advertencia: idAdv })
-  .then(function(d) {
-    if (d.ok) {
-      window.open(d.url, '_blank');
-      carregarRHAdvertencias();
-    } else toast('❌ ' + d.erro);
-  });
-}
-
-// ── PRONTUÁRIO ──────────────────────────────────────────────
-function carregarRHProntuario() {
-  api('empregados.listar').then(function(d) { if (d.ok) preencherSelectsRH(d.dados); });
-
-  var idEmp = val('pront-emp');
-  var el    = document.getElementById('pront-content');
-  var btnPDF = document.getElementById('btn-pdf-pront');
-
-  if (!idEmp) {
-    el.innerHTML = emptyState('📋','Selecione um empregado para ver o prontuário.');
-    btnPDF.style.display = 'none';
-    return;
-  }
-
-  el.innerHTML = '<div class="skeleton" style="height:400px;"></div>';
-  btnPDF.style.display = 'none';
-
-  api('rh.prontuario', { id_empregado: idEmp })
-  .then(function(d) {
-    if (!d.ok) { el.innerHTML = emptyState('📋', d.erro||'Erro.'); return; }
-    var p = d.prontuario;
-    var e = p.empregado;
-
-    btnPDF.style.display = 'inline-flex';
-
-    el.innerHTML =
-      // Dados pessoais
-      '<div class="grid-2 mb-24">' +
-        '<div class="card">' +
-          '<div class="card-titulo">Dados Pessoais</div>' +
-          '<table style="width:100%;font-size:13px;"><tbody>' +
-          campoTabela('Nome',           e.nome) +
-          campoTabela('CPF',            e.cpf||'—') +
-          campoTabela('RG',             e.rg||'—') +
-          campoTabela('Telefone',       e.telefone||'—') +
-          campoTabela('E-mail',         e.email||'—') +
-          campoTabela('Endereço',       e.endereco||'—') +
-          campoTabela('Emergência',     e.contato_emergencia||'—') +
-          '</tbody></table>' +
-        '</div>' +
-        '<div class="card">' +
-          '<div class="card-titulo">Dados Contratuais</div>' +
-          '<table style="width:100%;font-size:13px;"><tbody>' +
-          campoTabela('Cargo',          e.cargo||'—') +
-          campoTabela('Perfil',         e.perfil||'—') +
-          campoTabela('Admissão',       formatarDataBR(e.data_admissao)) +
-          campoTabela('Status',         e.status||'—') +
-          campoTabela('Salário base',   'R$ ' + fmtNum(e.salario_base||0)) +
-          campoTabela('% Comissão',     (e.percentual_comissao||'0') + '%') +
-          campoTabela('Jornada',        (e.jornada_contratada||'8') + 'h/dia') +
-          campoTabela('Banco',          e.dados_bancarios||'—') +
-          '</tbody></table>' +
-        '</div>' +
-      '</div>' +
-
-      // Stats RH
-      '<div class="grid-4 mb-24">' +
-        statCard('Dias registrados', p.jornada.total_dias_registrados, 'blue', '') +
-        statCard('Atestados',        p.atestados.length,               'amber','') +
-        statCard('Advertências',     p.advertencias.length,            'red',  '') +
-        statCard('Vendas fechadas',  p.produtividade.como_vendedor.vendas_fechadas, 'verde', '') +
-      '</div>' +
-
-      // Produtividade
-      '<div class="grid-2 mb-24">' +
-        '<div class="card">' +
-          '<div class="card-titulo">Como Captador</div>' +
-          '<table style="width:100%;font-size:13px;"><tbody>' +
-          campoTabela('Leads gerados',    p.produtividade.como_captador.leads_gerados) +
-          campoTabela('Convertidos',      p.produtividade.como_captador.leads_convertidos) +
-          campoTabela('Taxa de conversão',p.produtividade.como_captador.taxa_conversao) +
-          '</tbody></table>' +
-        '</div>' +
-        '<div class="card">' +
-          '<div class="card-titulo">Como Vendedor</div>' +
-          '<table style="width:100%;font-size:13px;"><tbody>' +
-          campoTabela('Leads recebidos',  p.produtividade.como_vendedor.leads_recebidos) +
-          campoTabela('Vendas fechadas',  p.produtividade.como_vendedor.vendas_fechadas) +
-          campoTabela('Crédito vendido',  'R$ ' + fmtNum(p.produtividade.como_vendedor.credito_total)) +
-          campoTabela('Taxa de conversão',p.produtividade.como_vendedor.taxa_conversao) +
-          '</tbody></table>' +
-        '</div>' +
-      '</div>' +
-
-      // Financeiro
-      '<div class="card mb-24">' +
-        '<div class="card-titulo">Financeiro — Comissões</div>' +
-        '<div class="grid-3">' +
-          statCard('Comissão paga',     'R$ ' + fmtNum(p.financeiro.comissao_paga),     'verde', '') +
-          statCard('Pendente',          'R$ ' + fmtNum(p.financeiro.comissao_pendente),  'amber', '') +
-          statCard('Total acumulado',   'R$ ' + fmtNum(p.financeiro.comissao_total),     'blue',  '') +
-        '</div>' +
-      '</div>' +
-
-      // Advertências
-      (p.advertencias.length ?
-        '<div class="card mb-24"><div class="card-titulo">Advertências</div>' +
-        '<div class="table-wrap"><table><thead><tr>' +
-        '<th>Nº</th><th>Data</th><th>Infração</th><th>Grau</th></tr></thead><tbody>' +
-        p.advertencias.map(function(a) {
-          return '<tr><td class="mono">' + esc(String(a.numero)) + '</td>' +
-            '<td class="mono">' + esc(formatarDataBR(a.data_infracao)) + '</td>' +
-            '<td>' + esc(a.tipo_infracao) + '</td>' +
-            '<td><span class="badge badge-red">' + esc(a.grau_texto) + '</span></td></tr>';
-        }).join('') + '</tbody></table></div></div>' : '') +
-
-      // Atestados
-      (p.atestados.length ?
-        '<div class="card mb-24"><div class="card-titulo">Atestados</div>' +
-        '<div class="table-wrap"><table><thead><tr>' +
-        '<th>Tipo</th><th>Início</th><th>Fim</th><th>Dias</th></tr></thead><tbody>' +
-        p.atestados.map(function(a) {
-          return '<tr><td>' + esc(a.tipo) + '</td>' +
-            '<td class="mono">' + esc(a.data_inicio) + '</td>' +
-            '<td class="mono">' + esc(a.data_fim) + '</td>' +
-            '<td>' + esc(String(a.dias)) + '</td></tr>';
-        }).join('') + '</tbody></table></div></div>' : '');
-  });
-}
-
-function campoTabela(label, valor) {
-  return '<tr><td class="text-muted" style="padding:5px 0;width:40%;">' + label + '</td>' +
-    '<td class="bold">' + esc(String(valor||'—')) + '</td></tr>';
-}
-
-function gerarPDFProntuario() {
-  var idEmp = val('pront-emp');
-  if (!idEmp) return toast('⚠️ Selecione um empregado.');
-  var btn = document.getElementById('btn-pdf-pront');
-  btn.textContent = '⏳ Gerando...';
-  btn.disabled = true;
-  apiPost({ action: 'rh.prontuario.pdf', id_empregado: idEmp })
-  .then(function(d) {
-    btn.textContent = '📄 Exportar PDF';
-    btn.disabled = false;
-    if (d.ok) {
-      window.open(d.url, '_blank');
-      toast('✅ PDF gerado com sucesso.');
-    } else toast('❌ ' + d.erro);
-  });
-}
-
-// ── ATESTADO ────────────────────────────────────────────────
-function salvarAtestado() {
-  var idEmp  = val('ate-emp');
-  var inicio = val('ate-inicio');
-  var fim    = val('ate-fim');
-  if (!idEmp || !inicio || !fim) return toast('⚠️ Preencha empregado, início e fim.');
-
-  // Calcula dias
-  var d1 = new Date(inicio); var d2 = new Date(fim);
-  var dias = Math.ceil((d2 - d1) / (1000*60*60*24)) + 1;
-  document.getElementById('ate-dias').value = dias;
-
-  apiPost({
-    action: 'rh.atestado.registrar',
-    id_empregado: idEmp,
-    tipo:         val('ate-tipo'),
-    data_inicio:  inicio,
-    data_fim:     fim,
-    dias:         dias,
-    descricao:    val('ate-desc'),
-    cid:          val('ate-cid')
-  }).then(function(d) {
-    if (d.ok) {
-      toast('✅ Atestado registrado.');
-      fecharModal('modal-atestado');
-    } else toast('❌ ' + d.erro);
-  });
-}
-
-// ── PONTO MANUAL ────────────────────────────────────────────
-function carregarRHAlertas() {
-  var el = document.getElementById('alertas-rh-content');
-  el.innerHTML = '<div class="skeleton" style="height:300px;"></div>';
-
-  api('rh.alertas').then(function(d) {
-    if (!d.ok) { el.innerHTML = emptyState('🚨', d.erro||'Erro ao carregar alertas.'); return; }
-    var a = d.alertas;
-
-    if (a.total === 0) {
-      el.innerHTML =
-        '<div class="card" style="text-align:center;padding:48px;">' +
-          '<div style="font-size:48px;margin-bottom:16px;">✅</div>' +
-          '<div style="font-size:18px;font-weight:700;color:var(--green);">Nenhum alerta no momento</div>' +
-          '<div class="text-muted" style="margin-top:8px;">Todos os empregados estão regulares.</div>' +
-          '<div style="font-size:11px;color:var(--text-muted);margin-top:16px;">Atualizado em ' + esc(a.gerado_em) + '</div>' +
-        '</div>';
-      return;
-    }
-
-    var html = '';
-
-    // Críticos
-    if (a.criticos.length) {
-      html += '<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="font-size:18px;">🔴</span>' +
-        '<span style="font-size:13px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;">Críticos — Ação imediata (' + a.criticos.length + ')</span>' +
-        '</div>';
-      a.criticos.forEach(function(al) {
-        html += renderAlerta(al, 'red');
-      });
-    }
-
-    // Atenção
-    if (a.atencao.length) {
-      html += '<div style="margin:24px 0 8px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="font-size:18px;">🟡</span>' +
-        '<span style="font-size:13px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;">Atenção — Monitorar (' + a.atencao.length + ')</span>' +
-        '</div>';
-      a.atencao.forEach(function(al) {
-        html += renderAlerta(al, 'amber');
-      });
-    }
-
-    // Informativos
-    if (a.informativos.length) {
-      html += '<div style="margin:24px 0 8px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="font-size:18px;">🔵</span>' +
-        '<span style="font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;">Informativos (' + a.informativos.length + ')</span>' +
-        '</div>';
-      a.informativos.forEach(function(al) {
-        html += renderAlerta(al, 'blue');
-      });
-    }
-
-    html += '<div style="font-size:11px;color:var(--text-muted);margin-top:24px;text-align:right;">Atualizado em ' + esc(a.gerado_em) + '</div>';
-    el.innerHTML = html;
-  }).catch(function(err) {
-    el.innerHTML = emptyState('🚨', 'Erro de conexão: ' + err.message);
-  });
-}
-
-function renderAlerta(al, cor) {
-  var cores = {
-    red:   { bg:'rgba(220,38,38,.08)',   borda:'rgba(220,38,38,.25)',   texto:'var(--red)'   },
-    amber: { bg:'rgba(217,119,6,.08)',   borda:'rgba(217,119,6,.25)',   texto:'var(--amber)' },
-    blue:  { bg:'rgba(37,99,235,.08)',   borda:'rgba(37,99,235,.25)',   texto:'var(--blue)'  }
-  };
-  var c = cores[cor] || cores.blue;
-
-  return '<div style="background:' + c.bg + ';border:1px solid ' + c.borda + ';' +
-    'border-left:4px solid ' + c.texto + ';border-radius:12px;padding:16px 20px;margin-bottom:10px;">' +
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">' +
-      '<div style="flex:1;">' +
-        '<div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px;">' +
-          '<span style="color:' + c.texto + ';margin-right:8px;">●</span>' + esc(al.titulo) +
-          '<span class="badge badge-gray" style="margin-left:8px;font-size:11px;">' + esc(al.empregado) + '</span>' +
-        '</div>' +
-        '<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">' + esc(al.mensagem) + '</div>' +
-        '<div style="font-size:12px;font-weight:600;color:' + c.texto + ';">→ ' + esc(al.acao) + '</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:6px;flex-shrink:0;">' +
-        (al.id_emp ?
-          '<button class="btn btn-xs btn-secondary" onclick="verProntuarioEmp('' + esc(al.id_emp) + '')">📋 Prontuário</button>' : '') +
-        '<button class="btn btn-xs btn-secondary" onclick="this.closest('div[style]').style.display='none'">Ignorar</button>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
-}
-
-function inserirPontoManual() {
-  var idEmp = val('mp-emp');
-  var data  = val('mp-data');
-  var hora  = val('mp-hora');
-  var tipo  = val('mp-tipo');
-  if (!idEmp || !data || !hora) return toast('⚠️ Preencha todos os campos obrigatórios.');
-
-  // Busca nome do empregado
-  var sel  = document.getElementById('mp-emp');
-  var nome = sel.options[sel.selectedIndex]?.text || '';
-
-  // Formata data para dd/MM/yyyy
-  var p = data.split('-');
-  var dataFmt = p[2] + '/' + p[1] + '/' + p[0];
-
-  apiPost({
-    action:          'rh.jornada.inserir',
-    id_empregado:    idEmp,
-    nome_empregado:  nome,
-    tipo_evento:     tipo,
-    data:            dataFmt,
-    hora:            hora,
-    observacao:      val('mp-obs')
-  }).then(function(d) {
-    if (d.ok) {
-      toast('✅ Ponto inserido manualmente. Log registrado.');
-      fecharModal('modal-inserir-ponto');
-      if (S.abaAtiva === 'rh-frequencia') carregarRHFrequencia();
-    } else toast('❌ ' + d.erro);
-  });
-}
-</script>
